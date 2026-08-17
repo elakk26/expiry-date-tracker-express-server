@@ -3,7 +3,7 @@
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const authDao = require("../daos/authDao");
+const authDao = require("../dao/authDao");
 
 /**
  * Generate a signed JWT.

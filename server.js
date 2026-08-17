@@ -1,11 +1,13 @@
 require("dotenv").config();
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 
-const connectDB = require("./src/configs/db");
-const swaggerSpec = require("./src/configs/swagger");
+const connectDB = require("./src/config/db");
+const swaggerSpec = require("./src/config/swagger");
 const authRoutes = require("./src/routes/authRoutes");
+const productRoutes = require("./src/routes/productRoutes");
 const errorHandler = require("./src/middlewares/errorHandler");
 
 const app = express();
@@ -14,6 +16,7 @@ const PORT = process.env.PORT || 5001;
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // ─── Swagger UI ───────────────────────────────────────────────────────────────
@@ -37,6 +40,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/products", productRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
