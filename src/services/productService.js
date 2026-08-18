@@ -10,23 +10,29 @@ const getProducts = async (userId, query) => {
 
   const filters = {};
   
-  // Don't show expired products here
-  filters.expiryDate = { $gte: new Date() };
+  // Don't show expired products here (expired = today or before)
+  const tomorrow = new Date();
+  tomorrow.setUTCHours(0, 0, 0, 0);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1); // Start of tomorrow
+  filters.expiryDate = { $gte: tomorrow };
 
   if (search) {
     filters.$text = { $search: search };
   }
 
   if (expiryWithin) {
-    const now = new Date();
-    const futureDate = new Date();
+    // Start calculating from tomorrow (since today is considered expired)
+    const futureDate = new Date(tomorrow);
     
-    if (expiryWithin === "7d") futureDate.setDate(now.getDate() + 7);
-    else if (expiryWithin === "1m") futureDate.setMonth(now.getMonth() + 1);
-    else if (expiryWithin === "3m") futureDate.setMonth(now.getMonth() + 3);
-    else if (expiryWithin === "6m") futureDate.setMonth(now.getMonth() + 6);
+    if (expiryWithin === "7d") futureDate.setUTCDate(tomorrow.getUTCDate() + 7 - 1); // 7 days from tomorrow includes tomorrow
+    else if (expiryWithin === "1m") futureDate.setUTCMonth(tomorrow.getUTCMonth() + 1);
+    else if (expiryWithin === "3m") futureDate.setUTCMonth(tomorrow.getUTCMonth() + 3);
+    else if (expiryWithin === "6m") futureDate.setUTCMonth(tomorrow.getUTCMonth() + 6);
     
-    filters.expiryDate = { $gte: now, $lte: futureDate };
+    // Set to end of the day for the future date to cover the entire day
+    futureDate.setUTCHours(23, 59, 59, 999);
+    
+    filters.expiryDate = { $gte: tomorrow, $lte: futureDate };
   }
 
   let sortObj = { expiryDate: 1 };

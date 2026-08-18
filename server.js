@@ -14,7 +14,13 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(cors());
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",")
+    : true,
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -52,9 +58,9 @@ app.use(errorHandler);
 
 // ─── Connect to Database then Start Server ────────────────────────────────────
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`📚 Swagger docs at http://localhost:${PORT}/api-docs`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`📚 Swagger docs at /api-docs`);
   });
 });
 

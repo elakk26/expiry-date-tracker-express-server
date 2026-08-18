@@ -15,7 +15,8 @@ const countByUser = (userId, filters = {}) => {
 
 const findExpiredByUser = (userId, skip = 0, limit = 20) => {
   const now = new Date();
-  return Product.find({ userId, expiryDate: { $lt: now } })
+  now.setUTCHours(0, 0, 0, 0);
+  return Product.find({ userId, expiryDate: { $lte: now } })
     .sort({ expiryDate: -1 })
     .skip(skip)
     .limit(limit);
@@ -23,7 +24,8 @@ const findExpiredByUser = (userId, skip = 0, limit = 20) => {
 
 const countExpiredByUser = (userId) => {
   const now = new Date();
-  return Product.countDocuments({ userId, expiryDate: { $lt: now } });
+  now.setUTCHours(0, 0, 0, 0);
+  return Product.countDocuments({ userId, expiryDate: { $lte: now } });
 };
 
 const findById = (productId, userId) => {
